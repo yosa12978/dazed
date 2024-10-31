@@ -35,7 +35,4 @@ func addV1Routes(router *http.ServeMux, options routerOptions) {
 		}
 		w.Write(body)
 	})
-	router.HandleFunc("GET /panic", func(w http.ResponseWriter, r *http.Request) {
-		panic("FUCKK!")
-	})
 }
