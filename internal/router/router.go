@@ -4,16 +4,26 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/yosa12978/dazed/internal/middleware"
 )
 
 func NewRouter(opts ...optionFunc) http.Handler {
 	options := newOptions(opts...)
+	options.logger.Debug("initializing router")
 	router := http.NewServeMux()
 	addV1Routes(router, options)
-	return router
+	handler := middleware.Composition(
+		router,
+		middleware.Logger(options.logger),
+		middleware.StripSlash(),
+		middleware.Recovery(options.logger),
+	)
+	return handler
 }
 
 func addV1Routes(router *http.ServeMux, options routerOptions) {
+	options.logger.Debug("adding v1 routes")
 	router.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "new router")
 	})
@@ -24,5 +34,8 @@ func addV1Routes(router *http.ServeMux, options routerOptions) {
 			return
 		}
 		w.Write(body)
+	})
+	router.HandleFunc("GET /panic", func(w http.ResponseWriter, r *http.Request) {
+		panic("FUCKK!")
 	})
 }
