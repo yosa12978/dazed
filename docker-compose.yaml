@@ -1,0 +1,54 @@
+services:
+  api:
+    container_name: dazed-api
+    build:
+      context: .
+      dockerfile: air.dockerfile
+    restart: always
+    ports:
+      - "3000:80"
+    volumes:
+      - ./:/app
+    environment:
+      - DAZED_APP_LOG_LEVEL=DEBUG
+      - DAZED_POSTGRES_USER=user
+      - DAZED_POSTGRES_PASSWORD=user
+      - DAZED_POSTGRES_DB=dazed_db
+      - DAZED_POSTGRES_URL=dazed-postgres:5432
+      - DAZED_POSTGRES_SSLMODE=disable
+      - DAZED_POSTGRES_MIGRATIONS_PATH=file://migrations
+    healthcheck:
+      test: curl -f http://localhost
+      interval: 1m
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    container_name: dazed-postgres
+    image: postgres
+    restart: always
+    ports:
+      - "3001:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+      - POSTGRES_DB=dazed_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  adminer:
+    container_name: dazed-adminer
+    image: adminer
+    restart: always
+    ports:
+      - "3003:8080" 
+
+volumes:
+  pg_data:
