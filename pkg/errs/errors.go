@@ -2,6 +2,8 @@ package errs
 
 import "errors"
 
+type ErrMap map[string]error
+
 var (
 	ErrNotFound        error = errors.New("not found")
 	ErrValidationError       = errors.New("validation error")
