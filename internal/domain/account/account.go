@@ -58,3 +58,16 @@ func (a *Account) ChangeRole(role Role) {
 	a.Role = role
 	a.UpdatedAt = NewUpdatedAt()
 }
+
+func (a *Account) IsAdmin() bool {
+	return a.Role == ADMIN
+}
+
+func (a *Account) HasPermission(initiator Account) (bool, error) {
+	stmt := initiator.IsAdmin() || (a.Username == initiator.Username)
+	var err error
+	if !stmt {
+		err = ErrNoPermission
+	}
+	return stmt, err
+}

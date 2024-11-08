@@ -15,4 +15,6 @@ var (
 	ErrPasswordIsTooShort             = errors.New("password length must be greater than 7")
 	ErrSaltIsEmpty                    = errors.New("salt is an empty string")
 	ErrRoleNotFound                   = errors.New("role doesn't exist")
+
+	ErrNoPermission = errors.New("account has no such permissions")
 )
